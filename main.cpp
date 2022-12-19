@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <sstream>
 
 using namespace std;
 
@@ -46,6 +47,23 @@ bool parseArgs(int argc, char *argv[], ifstream &inputFile, ofstream &outputFile
 	return true;
 }
 
+void processFile(ifstream &inputFile)
+{
+	string line;
+	while (getline(inputFile, line))
+	{
+		istringstream iss(line);
+		int a, b;
+		iss >> a >> b;
+		if (iss.fail())
+		{
+			cerr << "Skip" << endl;
+			continue;
+		}
+		cout << "OK || " << a << " " << b << endl;
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	ifstream inputFile;
@@ -53,5 +71,6 @@ int main(int argc, char *argv[])
 
 	if (!parseArgs(argc, argv, inputFile, outputFile))
 		return 1;
+	processFile(inputFile);
 	return 0;
 }
