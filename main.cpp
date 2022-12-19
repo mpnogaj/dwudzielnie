@@ -50,17 +50,17 @@ bool parseArgs(int argc, char *argv[], ifstream &inputFile, ofstream &outputFile
 void processFile(ifstream &inputFile)
 {
 	string line;
-	while (getline(inputFile, line))
+	for (int lineNr = 1; getline(inputFile, line); lineNr++)
 	{
 		istringstream iss(line);
 		int a, b;
 		iss >> a >> b;
 		if (iss.fail())
 		{
-			cerr << "Skip" << endl;
+			cerr << "Empty or invalid line at: " << lineNr << endl;
 			continue;
 		}
-		cout << "OK || " << a << " " << b << endl;
+		cout << "Line OK. Adding edge between: " << a << " " << b << endl;
 	}
 }
 
