@@ -1,3 +1,5 @@
+/** @file */ 
+
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -5,14 +7,24 @@
 
 using namespace std;
 
+/**
+ * @brief Parsuje argumenty i otwiera pliki 
+ * 
+ * @param argc Ilosc argumentow 
+ * @param argv Tablica argumentow
+ * @param inputFile Plik wejsciowy
+ * @param outputFile Plik wynikowy
+ * @return true parsowanie powiodlo sie
+ * @return false parsowanie nie powiodlo sie
+ */
 bool parseArgs(int argc, char *argv[], ifstream &inputFile, ofstream &outputFile)
 {
 	string inputFilePath(""), outputFilePath("");
 	for (int i = 1; i < argc; i++)
 	{
-		if (argv[i] == NULL || strlen(argv[i]) != 2)
-			continue;
-		if (argv[i][0] != '-')
+		// sprawdz czy argv[i] jest przelacznikiem
+		// jezeli nie to pomin
+		if (argv[i] == NULL || strlen(argv[i]) != 2 || argv[i][0] != '-')
 			continue;
 
 		if (argv[i][1] == 'i')
@@ -47,20 +59,25 @@ bool parseArgs(int argc, char *argv[], ifstream &inputFile, ofstream &outputFile
 	return true;
 }
 
-void processFile(ifstream &inputFile)
+/// @brief Przeczytaj plik wejsciowy i dla kazdych 2 liczb w linni wywolaj callback
+/// @param inputFile plik wejsciowy z danymi
+/// @param callback wskaznik do funkcji bioracej dwa inty, zwracajacej void
+void processFile(ifstream &inputFile, void (*callback)(int a, int b))
 {
 	string line;
 	for (int lineNr = 1; getline(inputFile, line); lineNr++)
 	{
+		// przeczytaj dokladnie 2 liczby z linii
 		istringstream iss(line);
 		int a, b;
 		iss >> a >> b;
 		if (iss.fail())
 		{
+			// jezeli nie udalo sie przeczytac 2 liczb to wypisz blad i idz dalej
 			cerr << "Empty or invalid line at: " << lineNr << endl;
 			continue;
 		}
-		cout << "Line OK. Adding edge between: " << a << " " << b << endl;
+		callback(a, b);
 	}
 }
 
@@ -69,8 +86,12 @@ int main(int argc, char *argv[])
 	ifstream inputFile;
 	ofstream outputFile;
 
+	// jezeli nie udalo sie sparsowac argumentow to zakoncz programa
 	if (!parseArgs(argc, argv, inputFile, outputFile))
 		return 1;
-	processFile(inputFile);
+	processFile(inputFile, [](int a, int b)
+	{ 
+		cout << "Line OK. Adding edge between: " << a << " " << b << endl;
+	});
 	return 0;
 }
