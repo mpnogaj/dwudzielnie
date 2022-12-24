@@ -1,16 +1,18 @@
-/** @file */ 
+/** @file */
 
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include <sstream>
 
+#include "graph.h"
+
 using namespace std;
 
 /**
- * @brief Parsuje argumenty i otwiera pliki 
- * 
- * @param argc Ilosc argumentow 
+ * @brief Parsuje argumenty i otwiera pliki
+ *
+ * @param argc Ilosc argumentow
  * @param argv Tablica argumentow
  * @param inputFile Plik wejsciowy
  * @param outputFile Plik wynikowy
@@ -62,7 +64,7 @@ bool parseArgs(int argc, char *argv[], ifstream &inputFile, ofstream &outputFile
 /// @brief Przeczytaj plik wejsciowy i dla kazdych 2 liczb w linni wywolaj callback
 /// @param inputFile plik wejsciowy z danymi
 /// @param callback wskaznik do funkcji bioracej dwa inty, zwracajacej void
-void processFile(ifstream &inputFile, void (*callback)(int a, int b))
+void processFile(ifstream &inputFile, Graph &graph)
 {
 	string line;
 	for (int lineNr = 1; getline(inputFile, line); lineNr++)
@@ -77,7 +79,7 @@ void processFile(ifstream &inputFile, void (*callback)(int a, int b))
 			cerr << "Empty or invalid line at: " << lineNr << endl;
 			continue;
 		}
-		callback(a, b);
+		graph.AddEdge(a, b);
 	}
 }
 
@@ -89,9 +91,13 @@ int main(int argc, char *argv[])
 	// jezeli nie udalo sie sparsowac argumentow to zakoncz programa
 	if (!parseArgs(argc, argv, inputFile, outputFile))
 		return 1;
-	processFile(inputFile, [](int a, int b)
-	{ 
-		cout << "Line OK. Adding edge between: " << a << " " << b << endl;
-	});
+	Graph graph = Graph();
+	processFile(inputFile, graph);
+	graph.PrintGraph(outputFile);
+	outputFile << endl;
+	if (graph.IsBigraph())
+		graph.PrintSets(outputFile);
+	else
+		outputFile << "Graf nie jest dwudzielny" << endl;
 	return 0;
 }
